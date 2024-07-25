@@ -3,36 +3,63 @@ import numpy as np
 import math
 from .utills import getDataFromExcel,getFromDict,interpolate_2d_array
 
+file_path='Surcharge Adjustment Factor.xlsx'
+ts0 = getDataFromExcel(file_path,'beta=0')
+ts30 = getDataFromExcel(file_path,'beta=30')
+ts45 = getDataFromExcel(file_path,'beta=45')
+ts60 = getDataFromExcel(file_path,'beta=60')
+ts75 = getDataFromExcel(file_path,'beta=75')
+ts90 = getDataFromExcel(file_path,'beta=90') 
+
+ts_dict={
+    0:ts0,
+    30:ts30,
+    45:ts45,
+    60:ts60,
+    75:ts75,
+    90:ts90
+}
+d2 = getDataFromExcel(file_path,'d=2')
+d1 = getDataFromExcel(file_path,'d=1')
+d05 = getDataFromExcel(file_path,'d=0.5')
+d0 =  getDataFromExcel(file_path,'d=0')
+
+d_dict={
+    2:d2,
+    1:d1,
+    0.5:d05,
+    0:d0
+}
 def getSurchargeFactor(q,l,H,beta,D,T):
-    file_path='Surcharge Adjustment Factor.xlsx'
+    # file_path='Surcharge Adjustment Factor.xlsx'
     if q==0 or beta==0:
         return 1
-    ts0 = getDataFromExcel(file_path,'beta=0')
-    ts30 = getDataFromExcel(file_path,'beta=30')
-    ts45 = getDataFromExcel(file_path,'beta=45')
-    ts60 = getDataFromExcel(file_path,'beta=60')
-    ts75 = getDataFromExcel(file_path,'beta=75')
-    ts90 = getDataFromExcel(file_path,'beta=90') 
+    # ts0 = getDataFromExcel(file_path,'beta=0')
+    # ts30 = getDataFromExcel(file_path,'beta=30')
+    # ts45 = getDataFromExcel(file_path,'beta=45')
+    # ts60 = getDataFromExcel(file_path,'beta=60')
+    # ts75 = getDataFromExcel(file_path,'beta=75')
+    # ts90 = getDataFromExcel(file_path,'beta=90') 
     
-    ts_dict={
-        0:ts0,
-        30:ts30,
-        45:ts45,
-        60:ts60,
-        75:ts75,
-        90:ts90
-    }
-    d2 = getDataFromExcel(file_path,'d=2')
-    d1 = getDataFromExcel(file_path,'d=1')
-    d05 = getDataFromExcel(file_path,'d=0.5')
-    d0 =  getDataFromExcel(file_path,'d=0')
+    # ts_dict={
+    #     0:ts0,
+    #     30:ts30,
+    #     45:ts45,
+    #     60:ts60,
+    #     75:ts75,
+    #     90:ts90
+    # }
+    # d2 = getDataFromExcel(file_path,'d=2')
+    # d1 = getDataFromExcel(file_path,'d=1')
+    # d05 = getDataFromExcel(file_path,'d=0.5')
+    # d0 =  getDataFromExcel(file_path,'d=0')
     
-    d_dict={
-        2:d2,
-        1:d1,
-        0.5:d05,
-        0:d0
-    }
+    # d_dict={
+    #     2:d2,
+    #     1:d1,
+    #     0.5:d05,
+    #     0:d0
+    # }
     if T==1:
         return getFromDict(ts_dict,beta,q/(l*H))
     else:
@@ -44,32 +71,55 @@ def getSurchargeFactor(q,l,H,beta,D,T):
             return getFromDict(d_dict,D/H,q/(l*H))
     pass
 
+file_path='Submergence and seepage Adjustment Factor.xlsx'
+ts0  = getDataFromExcel(file_path,'beta=0')
+ts30  = getDataFromExcel(file_path,'beta=30')
+ts45  = getDataFromExcel(file_path,'beta=45')
+ts60  = getDataFromExcel(file_path,'beta=60')
+ts90  = getDataFromExcel(file_path,'beta=90')
+ts_dict={
+    0:ts0,
+    30:ts30,
+    45:ts45,
+    60:ts60,
+    90:ts90
+}
+d2 = getDataFromExcel(file_path,'d=2')
+d1 = getDataFromExcel(file_path,'d=1')
+d05 = getDataFromExcel(file_path,'d=0.5')
+d0 = getDataFromExcel(file_path,'d=0')
+d_dict={
+    2:d2,
+    1:d1,
+    0.5:d05,
+    0:d0
+}
 def getSubmergenceAndSeepageFactor(Hw,Hwdash,H,beta,D,T):
-    file_path='Submergence and seepage Adjustment Factor.xlsx'
+    # file_path='Submergence and seepage Adjustment Factor.xlsx'
     if Hw==0 and Hwdash==0:
         return 1,1
-    ts0  = getDataFromExcel(file_path,'beta=0')
-    ts30  = getDataFromExcel(file_path,'beta=30')
-    ts45  = getDataFromExcel(file_path,'beta=45')
-    ts60  = getDataFromExcel(file_path,'beta=60')
-    ts90  = getDataFromExcel(file_path,'beta=90')
-    ts_dict={
-        0:ts0,
-        30:ts30,
-        45:ts45,
-        60:ts60,
-        90:ts90
-    }
-    d2 = getDataFromExcel(file_path,'d=2')
-    d1 = getDataFromExcel(file_path,'d=1')
-    d05 = getDataFromExcel(file_path,'d=0.5')
-    d0 = getDataFromExcel(file_path,'d=0')
-    d_dict={
-        2:d2,
-        1:d1,
-        0.5:d05,
-        0:d0
-    }
+    # ts0  = getDataFromExcel(file_path,'beta=0')
+    # ts30  = getDataFromExcel(file_path,'beta=30')
+    # ts45  = getDataFromExcel(file_path,'beta=45')
+    # ts60  = getDataFromExcel(file_path,'beta=60')
+    # ts90  = getDataFromExcel(file_path,'beta=90')
+    # ts_dict={
+    #     0:ts0,
+    #     30:ts30,
+    #     45:ts45,
+    #     60:ts60,
+    #     90:ts90
+    # }
+    # d2 = getDataFromExcel(file_path,'d=2')
+    # d1 = getDataFromExcel(file_path,'d=1')
+    # d05 = getDataFromExcel(file_path,'d=0.5')
+    # d0 = getDataFromExcel(file_path,'d=0')
+    # d_dict={
+    #     2:d2,
+    #     1:d1,
+    #     0.5:d05,
+    #     0:d0
+    # }
     
     if T==1:
         return getFromDict(ts_dict,beta,Hw/H),getFromDict(ts_dict,beta,Hwdash/H)
@@ -81,61 +131,114 @@ def getSubmergenceAndSeepageFactor(Hw,Hwdash,H,beta,D,T):
         else:   
             return getFromDict(d_dict,D/H,Hw/H),getFromDict(d_dict,D/H,Hwdash/H)
 
+
+file_path1='Tension Crack Adjustment Not Filled with water.xlsx'
+nw_ts0  =  getDataFromExcel(file_path1,'beta=0')
+nw_ts30  =  getDataFromExcel(file_path1,'beta=30')
+nw_ts45 = getDataFromExcel(file_path1,'beta=45')
+nw_ts60 = getDataFromExcel(file_path1,'beta=60')
+nw_ts75 = getDataFromExcel(file_path1,'beta=75')
+nw_ts90  = getDataFromExcel(file_path1,'beta=90')
+
+nw_ts_dict={
+    0:nw_ts0,
+    30:nw_ts30,
+    45:nw_ts45,
+    60:nw_ts60,
+    75:nw_ts75,
+    90:nw_ts90
+}
+nw_d1 = getDataFromExcel(file_path1,'d=1')
+nw_d05  = getDataFromExcel(file_path1,'d=0.5')
+nw_d0 = getDataFromExcel(file_path1,'d=0')
+
+nw_d_dict={
+    1:nw_d1,
+    0.5:nw_d05,
+    0:nw_d0
+}
+file_path2='Tension Crack Adjustment Filled with water.xlsx'
+
+ww_ts0  =  getDataFromExcel(file_path2,'beta=0')
+ww_ts30  =  getDataFromExcel(file_path2,'beta=30')
+ww_ts45 = getDataFromExcel(file_path2,'beta=45')
+ww_ts60 = getDataFromExcel(file_path2,'beta=60')
+ww_ts75 = getDataFromExcel(file_path2,'beta=75')
+ww_ts90  = getDataFromExcel(file_path2,'beta=90')
+
+ww_ts_dict={
+    0:ww_ts0,
+    30:ww_ts30,
+    45:ww_ts45,
+    60:ww_ts60,
+    75:ww_ts75,
+    90:ww_ts90
+}
+
+ww_d1 = getDataFromExcel(file_path2,'d=1')
+ww_d05  = getDataFromExcel(file_path2,'d=0.5')
+ww_d0 = getDataFromExcel(file_path2,'d=0')
+
+ww_d_dict={
+    1:ww_d1,
+    0.5:ww_d05,
+    0:ww_d0
+}
 def getTensionCrackFactor(Ht,H,beta,D,T):
-    file_path1='Tension Crack Adjustment Not Filled with water.xlsx'
+    # file_path1='Tension Crack Adjustment Not Filled with water.xlsx'
     if Ht==0:
         return 1
-    nw_ts0  =  getDataFromExcel(file_path1,'beta=0')
-    nw_ts30  =  getDataFromExcel(file_path1,'beta=30')
-    nw_ts45 = getDataFromExcel(file_path1,'beta=45')
-    nw_ts60 = getDataFromExcel(file_path1,'beta=60')
-    nw_ts75 = getDataFromExcel(file_path1,'beta=75')
-    nw_ts90  = getDataFromExcel(file_path1,'beta=90')
+    # nw_ts0  =  getDataFromExcel(file_path1,'beta=0')
+    # nw_ts30  =  getDataFromExcel(file_path1,'beta=30')
+    # nw_ts45 = getDataFromExcel(file_path1,'beta=45')
+    # nw_ts60 = getDataFromExcel(file_path1,'beta=60')
+    # nw_ts75 = getDataFromExcel(file_path1,'beta=75')
+    # nw_ts90  = getDataFromExcel(file_path1,'beta=90')
     
-    nw_ts_dict={
-        0:nw_ts0,
-        30:nw_ts30,
-        45:nw_ts45,
-        60:nw_ts60,
-        75:nw_ts75,
-        90:nw_ts90
-    }
-    nw_d1 = getDataFromExcel(file_path1,'d=1')
-    nw_d05  = getDataFromExcel(file_path1,'d=0.5')
-    nw_d0 = getDataFromExcel(file_path1,'d=0')
+    # nw_ts_dict={
+    #     0:nw_ts0,
+    #     30:nw_ts30,
+    #     45:nw_ts45,
+    #     60:nw_ts60,
+    #     75:nw_ts75,
+    #     90:nw_ts90
+    # }
+    # nw_d1 = getDataFromExcel(file_path1,'d=1')
+    # nw_d05  = getDataFromExcel(file_path1,'d=0.5')
+    # nw_d0 = getDataFromExcel(file_path1,'d=0')
     
-    nw_d_dict={
-        1:nw_d1,
-        0.5:nw_d05,
-        0:nw_d0
-    }
-    file_path2='Tension Crack Adjustment Filled with water.xlsx'
+    # nw_d_dict={
+    #     1:nw_d1,
+    #     0.5:nw_d05,
+    #     0:nw_d0
+    # }
+    # file_path2='Tension Crack Adjustment Filled with water.xlsx'
     
-    ww_ts0  =  getDataFromExcel(file_path2,'beta=0')
-    ww_ts30  =  getDataFromExcel(file_path2,'beta=30')
-    ww_ts45 = getDataFromExcel(file_path2,'beta=45')
-    ww_ts60 = getDataFromExcel(file_path2,'beta=60')
-    ww_ts75 = getDataFromExcel(file_path2,'beta=75')
-    ww_ts90  = getDataFromExcel(file_path2,'beta=90')
+    # ww_ts0  =  getDataFromExcel(file_path2,'beta=0')
+    # ww_ts30  =  getDataFromExcel(file_path2,'beta=30')
+    # ww_ts45 = getDataFromExcel(file_path2,'beta=45')
+    # ww_ts60 = getDataFromExcel(file_path2,'beta=60')
+    # ww_ts75 = getDataFromExcel(file_path2,'beta=75')
+    # ww_ts90  = getDataFromExcel(file_path2,'beta=90')
     
-    ww_ts_dict={
-        0:ww_ts0,
-        30:ww_ts30,
-        45:ww_ts45,
-        60:ww_ts60,
-        75:ww_ts75,
-        90:ww_ts90
-    }
+    # ww_ts_dict={
+    #     0:ww_ts0,
+    #     30:ww_ts30,
+    #     45:ww_ts45,
+    #     60:ww_ts60,
+    #     75:ww_ts75,
+    #     90:ww_ts90
+    # }
     
-    ww_d1 = getDataFromExcel(file_path2,'d=1')
-    ww_d05  = getDataFromExcel(file_path2,'d=0.5')
-    ww_d0 = getDataFromExcel(file_path2,'d=0')
+    # ww_d1 = getDataFromExcel(file_path2,'d=1')
+    # ww_d05  = getDataFromExcel(file_path2,'d=0.5')
+    # ww_d0 = getDataFromExcel(file_path2,'d=0')
     
-    ww_d_dict={
-        1:ww_d1,
-        0.5:ww_d05,
-        0:ww_d0
-    }
+    # ww_d_dict={
+    #     1:ww_d1,
+    #     0.5:ww_d05,
+    #     0:ww_d0
+    # }
     
     if T==1:
         if beta==0:

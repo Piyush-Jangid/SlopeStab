@@ -3,24 +3,53 @@ from SlopeStability import CHI_PHI_SOIL,INFINITE_SLOPE,PURELY_COHESIVE_SOIL,PURE
 import matplotlib.pyplot as plt
  
 plt.style.use('Rplot')
- 
-# PURELY_COHESIVE_SOIL_WITH_INCREASING_SHEAR_STRENGTH(beta,H,H0,Cb,l,lb):
-# PURELY_COHESIVE_SOIL_WITH_INCREASING_SHEAR_STRENGTH(45,100,15,1150,100,37.6)
 
-# CHI_PHI_SOIL(beta,H,Hw,Hc,Hwdash,c,phi,l,lw,q,Ht):
-# CHI_PHI_SOIL(30,23,0,0,0,280,17,120,62.5,0,0)
-
-# INFINITE_SLOPE(beta,theeta,H,c,phi,cdash,phdash,l,lw,X,T):
-# INFINITE_SLOPE(20,0,12,0,0,300,30,120,62.4,8,11.3)
-
-# PURELY_COHESIVE_SOIL(beta,H,Hw,Hwdash,D,c,lw,l,Ht,q):
 PURELY_COHESIVE_SOIL(beta=42,
                      H=13,
-                     Hw=5,
+                     Hw=0,
                      Hwdash=0,
                      D=7,
-                     c=410,
+                     c=[410, 0.2, 'normal'],
                      lw=62.5,
-                     l=120,
-                     Ht=0,
-                     q=220)
+                     l=[120, 0.2, 'normal'],
+                     Ht=0,q=220,
+                     str='probabilistic',
+                     num_simulations=10000)
+
+# CHI_PHI_SOIL(beta=30,
+#              H=23,
+#              Hw=4,
+#              Hc=0,
+#              Hwdash=0,
+#              D=0,
+#              c=[280, 0.2, 'normal'],
+#              phi=[17,0.15,'normal'],
+#              l=[120, 0.2, 'normal'],
+#              lw=62.5,
+#              q=40,
+#              Ht=0,
+#              str='probabilistic',
+#              num_simulations=100)
+
+# INFINITE_SLOPE(beta=20,
+#                theeta=0,
+#                H=12,
+#                c=[0, 0.2, 'normal'],
+#                phi=[0, 0.15, 'normal'],
+#                cdash=[300, 0.2, 'normal'],
+#                phdash=[30, 0.15, 'normal'],
+#                l=[120, 0.2, 'normal'],
+#                lw=62.4,
+#                X=8,
+#                T=11.3,
+#                str='probabilistic',
+#                num_simulations=10000)
+                                                                                                                                                                                # deterministic
+# PURELY_COHESIVE_SOIL_WITH_INCREASING_SHEAR_STRENGTH(beta=45,
+#                                                     H=100,
+#                                                     H0=15,
+#                                                     cb=[1150, 0.2, 'normal'],
+#                                                     l = [100, 0.2, 'normal'],
+#                                                     lb = [37.6, 0.2, 'normal'],
+#                                                     str='probabilistic',
+#                                                     num_simulations=10000)

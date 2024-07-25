@@ -1,8 +1,11 @@
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+from matplotlib.cm import ScalarMappable
 import pandas as pd
 import numpy as np
 import math 
 from openpyxl import load_workbook
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import pkg_resources
 import os
 
@@ -91,112 +94,13 @@ def getFromDict(m,d,x):
     return result
     pass
 
-def FailureCircle(x0,y0,D,H,beta,T,q,Hw):
-    if D==0:
-        D=H
-    # Convert slope angle from degrees to radians
-    beta_rad = np.radians(beta)
-
-    # Create a figure and an axes
-    fig, ax = plt.subplots(2,1,figsize=(8, 10))
-
-    # Plot the slope line
-    line_length = H / np.sin(beta_rad)
-    line_x = [0, line_length * np.cos(beta_rad)]
-    line_y = [0, H]
-
-    # Ensure only positive x values (i.e., the line should point to the right)
-    if line_x[1] < 0:
-        line_x[1] = -line_x[1]
-        line_y[1] = -line_y[1]
-
-    # Plot the slope line
-    ax[0].plot(line_x, line_y, label='Slope Line', color='black')
-    
-    a=1.5*H
-    # Plot the horizontal line at the height of the slope
-    x_values = np.linspace(H / np.tan(beta_rad), H / np.tan(beta_rad)+a, 40)  # Adjust max value if needed
-    y_values = np.full_like(x_values, H)  # y=H for all x in x_values
-    ax[0].plot(x_values, y_values, color='black', label='Horizontal Line at H')
-
-
-# Plot the horizontal line at the depth of the foundation
-    x_values_depth = np.linspace(-(a), 0, 40)
-    y_values_depth = np.full_like(x_values_depth, 0)  # y=0 for all x in x_values_depth
-    ax[0].plot(x_values_depth, y_values_depth, color='black', label='Foundation Depth Line')
-    
-    x_values_depth = np.linspace(-(a),H/np.tan(beta_rad)+a , 80)
-    y_values_depth = np.full_like(x_values_depth, -D)  # y=0 for all x in x_values_depth
-    ax[0].plot(x_values_depth, y_values_depth, color='black', label='Foundation Depth Line')
-    
-    x_values_depth = np.linspace(0, H/np.tan(beta_rad)+a, 40)
-    y_values_depth = np.full_like(x_values_depth,0)  # y=0 for all x in x_values_depth
-    ax[0].plot(x_values_depth, y_values_depth, linestyle='--',color='black', label='Foundation Depth Line')
-
-    x_const = -a
-    y_range = np.linspace(0,-D, 40)
-    # Plot the line parallel to y-axis
-    ax[0].plot([x_const]*len(y_range), y_range,color='black')
-    
-    x_const = H/np.tan(beta_rad)+a
-    y_range = np.linspace(-D,H, 40)
-    # Plot the line parallel to y-axis
-    ax[0].plot([x_const]*len(y_range), y_range,color='black')
-    
-    if q!=0:
-        num_arrows = 5  # Number of arrows
-        x_arrows = np.linspace(H / np.tan(beta_rad), H/np.tan(beta_rad)+a, num_arrows)
-
-        # Length of each arrow
-        arrow_length = 3  # Shorter length
-        i=0
-        for x in x_arrows:
-            if(i==np.round(len(x_arrows)/2)):
-                ax[0].annotate(f'q={q}', xy=(x, H), xytext=(x,H+arrow_length),arrowprops=dict(facecolor='red', shrink=1))  # Adjust shrink for smaller arrow
-            else:
-                ax[0].annotate('', xy=(x, H), xytext=(x,H+arrow_length),arrowprops=dict(facecolor='red', shrink=1))
-            i=i+1
-    if Hw!=0:
-        x_values_depth = np.linspace(-(a), Hw/np.tan(beta_rad), 40)
-        y_values_depth = np.full_like(x_values_depth, Hw)  # y=0 for all x in x_values_depth
-        ax[0].plot(x_values_depth, y_values_depth, color='blue', label='Foundation Depth Line')
-        x_const = -a
-        y_range = np.linspace(0,Hw, 40)
-        # Plot the line parallel to y-axis
-        ax[0].plot([x_const]*len(y_range), y_range,color='blue')
-        ax[0].annotate('', xy=(-a/2, Hw), xytext=(-a/2,Hw+2),arrowprops=dict(facecolor='blue', shrink=0.1))
-        ax[0].annotate(f'Hw: {Hw}', xy=(-a, Hw/2), xytext=(-(a+9), Hw/2),
-                arrowprops=dict(facecolor='red', arrowstyle='->'), fontsize=12, color='red')
-        
-    # Annotate the slope angle
-    ax[0].annotate(f'Angle: {beta}°', xy=(line_x[1]/2, line_y[1]/2), xytext=(line_x[1]/2 + 5, line_y[1]/2),
-                arrowprops=dict(facecolor='red', arrowstyle='->'), fontsize=12, color='red')
-    if D!=0:
-        ax[0].annotate(f'D: {D}', xy=(-a, -D/2), xytext=(-(a+9), -D/2),
-                arrowprops=dict(facecolor='red', arrowstyle='->'), fontsize=12, color='red')
-        ax[0].annotate(f'D: {D}', xy=(H/np.tan(beta_rad)+a, -D/2), xytext=(H/np.tan(beta_rad)+a+5, -D/2),
-            arrowprops=dict(facecolor='red', arrowstyle='->'), fontsize=12, color='red')
-
-    ax[0].annotate(f'H: {H}', xy=(H/np.tan(beta_rad)+a, H/2), xytext=(H/np.tan(beta_rad)+a+5, H/2),
-                arrowprops=dict(facecolor='red', arrowstyle='->'), fontsize=12, color='red')
-    
-    # Set the aspect of the plot to be equal
-    ax[0].set_aspect('equal')
-
-    # Set labels and title
-    ax[0].set_xlabel('x')
-    ax[0].set_ylabel('y')
-    ax[0].set_title('Problem statement',pad=20)
-    ax[0].axis('off')
-    
+def FailureCircle(x0,y0,D,H,T,clr,ax):
     # Define the circle's center and radius
     center = (x0, y0)
     if T==1:
         radius = np.sqrt(x0*x0+y0*y0)
     else:
-        radius = y0+D
-    beta=beta_rad
-
+        radius = y0+D\
     # Create an array of angles from 0 to 2pi
     theta = np.linspace(0, 2 * np.pi, 2000)
 
@@ -213,62 +117,178 @@ def FailureCircle(x0,y0,D,H,beta,T,q,Hw):
         if (x[i] >= 0 and y[i] <= H) or (y[i]<=0 and x[i]<=0) :
             x1.append(x[i])
             y1.append(y[i])
+    
     # Plot the filtered circle
-    ax[1].plot(x1, y1, label='Filtered Circle: y<=H and x>=0')
+    ax.plot(x1, y1, color=clr)
+    pass
 
-
-    # Define the line properties
-    line_length = H/np.sin(beta)
-    line_angle_rad = beta
-
-    # Calculate the endpoints of the line
-    line_x = [0, line_length * np.cos(line_angle_rad)]
-    line_y = [0, line_length * np.sin(line_angle_rad)]
+def DrawSolution(x0_list,y0_list,D_list,H,beta,T_list,q,Hw,Hwdash,fos_values):
+    median_fos = np.median(fos_values)
+    x0_list = np.array(x0_list)
+    y0_list = np.array(y0_list)
+    D_list = np.array(D_list)
+    T_list = np.array(T_list)
+    
+    # Create a figure and an axes
+    fig, ax = plt.subplots(figsize=(12, 20))
+    
+    D = max(D_list)
+    
+    if D==0:
+        D=H
+        
+    # Convert slope angle from degrees to radians
+    beta_rad=np.radians(beta)
+    # Plot the slope line
+    line_length = H / np.sin(beta_rad)
+    line_x = [0, line_length * np.cos(beta_rad)]
+    line_y = [0, H]
 
     # Ensure only positive x values (i.e., the line should point to the right)
     if line_x[1] < 0:
         line_x[1] = -line_x[1]
         line_y[1] = -line_y[1]
 
-    # Plot the line
-    ax[1].plot(line_x, line_y, label='Line from origin, length H', color='black')
-
-    x_values = np.linspace(H/np.tan(beta), max(40, 2*x0+radius), 40)  # Adjust max value if needed
+    # Plot the slope line
+    ax.plot(line_x, line_y, label='Slope Line', color='#C04000')
+    
+    r1=np.sqrt((x0_list)**2+(y0_list)**2)
+    r2=(y0_list)+(D_list)
+    a = max(x0_list) + max(max(r1),max(r2))+7
+    b = max(max(np.sqrt(r1**2-y0_list**2)),max(np.sqrt(r2**2-y0_list**2)))+5
+    
+    # Plot the horizontal line at the height of the slope
+    x_values = np.linspace(H / np.tan(beta_rad), a, 40)  # Adjust max value if needed
     y_values = np.full_like(x_values, H)  # y=H for all x in x_values
-    ax[1].plot(x_values, y_values, color='black')
+    ax.plot(x_values, y_values, color='#C04000', label='Horizontal Line at H')
+
+
+# Plot the horizontal line at the depth of the foundation
+    x_values_depth = np.linspace(-b, 0, 40)
+    y_values_depth = np.full_like(x_values_depth, 0)  # y=0 for all x in x_values_depth
+    ax.plot(x_values_depth, y_values_depth, color='#C04000', label='Foundation Depth Line')
     
-    x_values_y0 = np.linspace(-np.sqrt(radius*radius-y0*y0), 0, 100)  # Adjust min value if needed
-    y_values_y0 = np.full_like(x_values_y0, 0)  # y=0 for all x in x_values_y0
-    ax[1].plot(x_values_y0, y_values_y0, color='black', label='Line y=0 for x<=0')
+    x_values_depth = np.linspace(-b,a , 80)
+    y_values_depth = np.full_like(x_values_depth, -D)  # y=0 for all x in x_values_depth
+    ax.plot(x_values_depth, y_values_depth, color='#C04000', label='Foundation Depth Line')
     
-    x_values_y0 = np.linspace(-np.sqrt(radius*radius-y0*y0), max(40, 2*x0+radius), 100)  # Adjust min value if needed
-    y_values_y0 = np.full_like(x_values_y0, -D)  # y=0 for all x in x_values_y0
-    ax[1].plot(x_values_y0, y_values_y0, color='black', label='Line y=0 for x<=0')
+    x_values_depth = np.linspace(0, a, 40)
+    y_values_depth = np.full_like(x_values_depth,0)  # y=0 for all x in x_values_depth
+    ax.plot(x_values_depth, y_values_depth, linestyle='--',color='red', label='Foundation Depth Line')
+
+    x_const = -b
+    y_range = np.linspace(0,-D, 40)
+    # Plot the line parallel to y-axis
+    ax.plot([x_const]*len(y_range), y_range,color='#C04000')
     
-    x_const = max(40, 2*x0+radius)
+    x_const = a
     y_range = np.linspace(-D,H, 40)
     # Plot the line parallel to y-axis
-    ax[1].plot([x_const]*len(y_range), y_range,color='black')
+    ax.plot([x_const]*len(y_range), y_range,color='#C04000')
     
-    x_const = -np.sqrt(radius*radius-y0*y0)
-    y_range = np.linspace(-D,0, 40)
-    # Plot the line parallel to y-axis
-    ax[1].plot([x_const]*len(y_range), y_range,color='black')
+    if Hwdash!=0:
+        x_values_depth = np.linspace(Hwdash/np.tan(beta_rad),a, 40)
+        y_values_depth = np.full_like(x_values_depth, Hwdash)  # y=0 for all x in x_values_depth
+        ax.plot(x_values_depth, y_values_depth, color='blue', label='Foundation Depth Line')
+        
+        ax.annotate(f'Hwdash={Hwdash} feet/m', xy=(a/2.5, Hwdash), xytext=(a/2.5,Hwdash+4),arrowprops=dict(facecolor='blue', shrink=0.1))
+
+    # Annotate the slope angle
+    ax.annotate(f'Angle: {beta}°', xy=(line_x[1]/2, line_y[1]/2), xytext=(line_x[1]/2 + 5, line_y[1]/2),
+                arrowprops=dict(facecolor='black', arrowstyle='->'), fontsize=12, color='black')
+    
+    ax.annotate(f'H: {H} feet/m', xy=(a, H/2), xytext=(a+2, H/2),
+                arrowprops=dict(facecolor='black', arrowstyle='->'), fontsize=12, color='black')
+    
+    if D!=0:
+        ax.annotate(f'D: {D} feet/m', xy=(-b, -D/2), xytext=(-(b+14.5), -D/2),
+            arrowprops=dict(facecolor='black', arrowstyle='->'), fontsize=12, color='black')
+    if Hw!=0:
+        x_values_depth = np.linspace(-(b), Hw/np.tan(beta_rad), 40)
+        y_values_depth = np.full_like(x_values_depth, Hw)  # y=0 for all x in x_values_depth
+        ax.plot(x_values_depth, y_values_depth, color='blue', label='Foundation Depth Line')
+        x_const = -b
+        y_range = np.linspace(0,Hw, 40)
+        # Plot the line parallel to y-axis
+        ax.plot([x_const]*len(y_range), y_range,color='blue')
+        ax.annotate('', xy=(-b/2, Hw), xytext=(-b/2,Hw+1),arrowprops=dict(facecolor='blue', shrink=0.1))
+        ax.annotate(f'Hw: {Hw} feet/m', xy=(-b, Hw/2), xytext=(-(b+14.5), Hw/2),
+                arrowprops=dict(facecolor='black', arrowstyle='->'), fontsize=12, color='black')
+    if q!=0:
+        num_arrows = 5  # Number of arrows
+        x_arrows = np.linspace(H / np.tan(beta_rad),a, num_arrows)
+
+        # Length of each arrow
+        arrow_length = 2  # Shorter length
+        i=0
+        for x in x_arrows:
+            if(i==np.round(len(x_arrows)/2)):
+                ax.annotate(f'q={q} kPa/psf', xy=(x, H), xytext=(x,H+2.5),arrowprops=dict(facecolor='black',shrink=0.1))  # Adjust shrink for smaller arrow
+            else:
+                ax.annotate('', xy=(x, H), xytext=(x,H+arrow_length),arrowprops=dict(facecolor='black',shrink=0.1))
+            i=i+1
 
     # Set the aspect of the plot to be equal
-    ax[1].set_aspect('equal')
+    n = len(x0_list)
+    cmap = mcolors.LinearSegmentedColormap.from_list('yellow_to_red', ['yellow', 'red'])
+    if n>1:
+        # Generate the colors from the colormap
+        colors = [mcolors.rgb2hex(cmap(i / (n - 1))) for i in range(n)]
+        # print(colors)
+        for i in range(n):
+            clr = colors[i]
+            FailureCircle(x0_list[i], y0_list[i], D_list[i], H, T_list[i], clr, ax)
+    else:
+        FailureCircle(x0_list[0],y0_list[0],D_list[0],H,T_list[0],'yellow',ax)
 
+    
+    x0_list, y0_list, D_list, T_list = map(np.array, (x0_list, y0_list, D_list, T_list))
+    median_index = np.argsort(fos_values)[len(fos_values) // 2]
+    median_fos = fos_values[median_index]
+    median_x0 = x0_list[median_index]
+    median_y0 = y0_list[median_index]
+    median_D = D_list[median_index]
+    median_T = T_list[median_index]
+
+    FailureCircle(median_x0,median_y0, median_D, H, median_T, 'black', ax)
+
+    # Adding color bar at top-left corner
+    norm = plt.Normalize(vmin=min(fos_values), vmax=max(fos_values))
+    sm = ScalarMappable(cmap=cmap, norm=norm)
+    sm.set_array([])  # Dummy array for the ScalarMappable
+    cbar_ax = inset_axes(ax, width="50%", height="70%", loc='upper left', bbox_to_anchor=(0.05, 0.95, 0.9, 0.1), bbox_transform=ax.transAxes)
+    cbar = plt.colorbar(sm, cax=cbar_ax, orientation='horizontal') #(0.1,0.95,1,1)
+    cbar.set_label('Factor of Safety', labelpad=-60,size=15)
+    
+    ax.set_aspect('equal')
     # Set labels and title
-    ax[1].set_xlabel('x')
-    ax[1].set_ylabel('y')
-    if T==1:
-        str='Toe circle'
-    elif T==2:
-        str='Deep circle'
-    elif T==3:
-        str='Slope circle'
-    ax[1].set_title(str)
-    ax[1].axis('off')
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    # ax.set_title('Solution',pad=30,size=20)
+    ax.axis('off')
 
-    # Show the plot
-    plt.show()
+    # plt.show() 
+    pass
+
+def generate_samples(mean, cov, dist_type, num_samples):
+    if dist_type == 'normal':
+        std = mean * cov
+        samples = np.random.normal(mean, std, num_samples)
+        # Ensure samples are positive
+        samples = np.clip(samples, 0, None)
+    elif dist_type == 'lognormal':
+        std = mean * cov
+        mean_ln = np.log(mean**2 / np.sqrt(std**2 + mean**2))
+        sigma_ln = np.sqrt(np.log(std**2 / mean**2 + 1))
+        samples = np.random.lognormal(mean_ln, sigma_ln, num_samples)
+    elif dist_type == 'uniform':
+        std = mean * cov
+        lower = mean - std * np.sqrt(3)
+        upper = mean + std * np.sqrt(3)
+        samples = np.random.uniform(lower, upper, num_samples)
+        # Ensure samples are positive
+        samples = np.clip(samples, 0, None)
+    else:
+        raise ValueError(f"Unsupported distribution type: {dist_type} Supported only normal, lognormal and uniform")
+    return samples
+    pass
